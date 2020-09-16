@@ -199,7 +199,7 @@ class MainActivity : AppCompatActivity() {
     @Throws(IOException::class)
     private fun loadmodelfile(activity: Activity): MappedByteBuffer? {
         val fileDescriptor =
-            activity.assets.openFd("final.tflite")
+            activity.assets.openFd("carmodel.tflite")
         val inputStream =
             FileInputStream(fileDescriptor.fileDescriptor)
         val fileChannel = inputStream.channel
@@ -233,7 +233,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun showresult() {
         try {
-            labels = FileUtil.loadLabels(this, "myfile.txt")
+            labels = FileUtil.loadLabels(this, "ans.txt")
            // type=FileUtil.loadLabels(this,"type.txt")
         } catch (e: Exception) {
             e.printStackTrace()
