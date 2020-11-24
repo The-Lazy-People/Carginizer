@@ -18,7 +18,10 @@ import androidx.camera.core.Camera
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import kotlinx.android.synthetic.main.bottomsheet_activity.*
 import kotlinx.android.synthetic.main.content_main_activity.*
 import org.tensorflow.lite.DataType
@@ -49,6 +52,7 @@ class MainActivity : AppCompatActivity() {
     private var imageCapture: ImageCapture? = null
     private var camera: Camera? = null
     private val TAG = "CameraXBasic"
+    val firebase=FirebaseDatabase.getInstance().reference
 
     private lateinit var cameraExecutor: ExecutorService
 
@@ -71,8 +75,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        if (ActivityCompat.checkSelfPermission(this,Manifest.permission.CAMERA)!=PackageManager.PERMISSION_GRANTED){
-            requestPermissions(arrayOf(Manifest.permission.CAMERA),1001)
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)!=PackageManager.PERMISSION_GRANTED){
+            requestPermissions(arrayOf(Manifest.permission.CAMERA), 1001)
         }
         else{
             startCamera()
@@ -83,6 +87,34 @@ class MainActivity : AppCompatActivity() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+        dataChangeListener()
+    }
+
+    private fun dataChangeListener() {
+        val ref =firebase.child("Name")
+        ref.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val value = dataSnapshot.getValue(String::class.java)!!
+                tvPokemonName1.text=value
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // Failed to read value
+                Log.w(TAG, "Failed to read value.", error.toException())
+            }
+        })
+        val ref1 =firebase.child("Type")
+        ref1.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val value = dataSnapshot.getValue(String::class.java)!!
+                tvPokemonType1.text=value
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // Failed to read value
+                Log.w(TAG, "Failed to read value.", error.toException())
+            }
+        })
     }
 
     private fun Image.toBitmap(): Bitmap {
@@ -157,37 +189,47 @@ class MainActivity : AppCompatActivity() {
 
 
 
-            imageAnalysis.setAnalyzer(ContextCompat.getMainExecutor(this), ImageAnalysis.Analyzer { image ->
-                val matrix = Matrix()
-                matrix.postRotate(90f)
-                val scaledBitmap = Bitmap.createScaledBitmap(image.image!!.toBitmap(), image.image!!.toBitmap().width, image.image!!.toBitmap().height, true)
-                val rotatedBitmap = Bitmap.createBitmap(
-                    scaledBitmap,
-                    0,
-                    0,
-                    scaledBitmap.width,
-                    scaledBitmap.height,
-                    matrix,
-                    true
-                )
-                classify( rotatedBitmap)
-                image.close()
+            imageAnalysis.setAnalyzer(
+                ContextCompat.getMainExecutor(this),
+                ImageAnalysis.Analyzer { image ->
+                    val matrix = Matrix()
+                    matrix.postRotate(90f)
+                    val scaledBitmap = Bitmap.createScaledBitmap(
+                        image.image!!.toBitmap(),
+                        image.image!!.toBitmap().width,
+                        image.image!!.toBitmap().height,
+                        true
+                    )
+                    val rotatedBitmap = Bitmap.createBitmap(
+                        scaledBitmap,
+                        0,
+                        0,
+                        scaledBitmap.width,
+                        scaledBitmap.height,
+                        matrix,
+                        true
+                    )
+                    classify(rotatedBitmap)
+                    image.close()
 
-            })
-            val cameraSelector = CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_BACK).build()
+                })
+            val cameraSelector =
+                CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_BACK).build()
             try {
                 cameraProvider.unbindAll()
                 camera = cameraProvider.bindToLifecycle(
-                    this, cameraSelector, preview, imageCapture,imageAnalysis)
+                    this, cameraSelector, preview, imageCapture, imageAnalysis
+                )
                 preview?.setSurfaceProvider(viewFinder.createSurfaceProvider(camera?.cameraInfo))
-            } catch(exc: Exception) {
+            } catch (exc: Exception) {
                 Log.e(TAG, "Use case binding failed", exc)
             }
         }, ContextCompat.getMainExecutor(this))
 
     }
     inline fun View.afterMeasured(crossinline block: () -> Unit) {
-        viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+        viewTreeObserver.addOnGlobalLayoutListener(object :
+            ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 if (measuredWidth > 0 && measuredHeight > 0) {
                     viewTreeObserver.removeOnGlobalLayoutListener(this)
@@ -238,7 +280,11 @@ class MainActivity : AppCompatActivity() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        val labeledProbability: Map<String, Float> = TensorLabel(labels!!.toList(), probabilityProcessor!!.process(outputProbabilityBuffer)).mapWithFloatValue;
+        val labeledProbability: Map<String, Float> = TensorLabel(
+            labels!!.toList(), probabilityProcessor!!.process(
+                outputProbabilityBuffer
+            )
+        ).mapWithFloatValue;
        // val typedProbability:Map<String,Float> = TensorLabel(type!!.toList(), probabilityProcessor!!.process(outputProbabilityBuffer)).mapWithFloatValue
        // val typer = mutableMapOf<String,String>()
 //        for (i in 0..labels!!.size-1){
@@ -279,12 +325,13 @@ class MainActivity : AppCompatActivity() {
 //                t3=value
 //            }
 //        }
-        tvPokemonName1.text=s1
-        tvPokemonName2.text=s2
-        tvPokemonName3.text=s3
-        tvPokemonType1.text=t1
-        tvPokemonType2.text=t2
-        tvPokemonType3.text=t3
+//        tvPokemonName1.text=s1
+//        tvPokemonName2.text=s2
+//        tvPokemonName3.text=s3
+//        tvPokemonType1.text=t1
+//        tvPokemonType2.text=t2
+//        tvPokemonType3.text=t3
+
     }
 
     private fun classify(bitmap: Bitmap)

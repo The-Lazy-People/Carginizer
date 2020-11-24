@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "835478606666",
+    "firebase_url": "https://camerax-f7e9b.firebaseio.com",
+    "project_id": "camerax-f7e9b",
+    "storage_bucket": "camerax-f7e9b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:835478606666:android:adafa8767bcdddeb03e7b3",
+        "android_client_info": {
+          "package_name": "com.abhitom.camerax"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "835478606666-vk44dplu9a0cct4vv1e99vf2o14dnq5g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDFXXc0kc2ba1uvVELykg5g3xWyghra14"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "835478606666-vk44dplu9a0cct4vv1e99vf2o14dnq5g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
