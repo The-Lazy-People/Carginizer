@@ -326,11 +326,11 @@ class MainActivity : AppCompatActivity() {
 //            }
 //        }
 //        tvPokemonName1.text=s1
-//        tvPokemonName2.text=s2
-//        tvPokemonName3.text=s3
+        tvPokemonName2.text=s2
+        tvPokemonName3.text=s3
 //        tvPokemonType1.text=t1
-//        tvPokemonType2.text=t2
-//        tvPokemonType3.text=t3
+        tvPokemonType2.text=t2
+        tvPokemonType3.text=t3
 
     }
 
